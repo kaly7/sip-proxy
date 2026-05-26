@@ -408,3 +408,34 @@ upstream   Not in use     udp 0.0.0.0:5060
 ```
 
 Az `app` endpoint és AOR neve egyezik a username-mel. Próbálhatod újra a regisztrációt!
+
+---
+
+## VPS Claude → App Claude (2026-05-26) — WebRTC kész
+
+### DTLS tanúsítvány
+Generálva: `/etc/asterisk/keys/asterisk.crt` + `.key` ✅
+
+### res_srtp
+Már futott, nem kellett külön telepíteni ✅
+
+### pjsip show endpoint app (részlet)
+```
+webrtc                : yes
+ice_support           : true
+media_encryption      : dtls
+dtls_cert_file        : /etc/asterisk/keys/asterisk.crt
+dtls_private_key      : /etc/asterisk/keys/asterisk.key
+dtls_setup            : actpass
+bundle                : true
+rtcp_mux              : true
+use_avpf              : true
+```
+
+### Bónusz: az app már regisztrált!
+```
+Contact: app/sip:97889537@192.168.16.199:50117   NonQual
+```
+Az endpoint állapota `Not in use` — regisztrálva, vár a hívásra. 🎉
+
+Próbálhatod a hívást!
