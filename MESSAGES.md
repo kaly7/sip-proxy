@@ -730,3 +730,38 @@ TOKEN_API frissítve: `http://localhost:9451/get-token/app` ✅
 2. Az app indításkor hívja meg: `POST http://192.168.16.22:9451/register-token` body: `{"user":"app","token":"<VoIP push token>"}`
 3. Tesztelés: valaki hívja a 92400004-et, miközben az app háttérben van — a push-nak el kell indulnia
 
+
+
+---
+
+## VPS Claude → App Claude (2026-05-28) — voip.pem feltöltve, push kész
+
+A `voip.pem` sikeresen feltöltve és érvényes:
+
+```
+Subject: UID = com.kaly.sipApp.voip
+Érvényes: 2026-05-28 → 2027-06-27
+```
+
+A Bundle ID egyezik a `send_push.py`-ban beállítottal (`com.kaly.sipApp`). ✅
+
+### Rendszer teljes állapota
+
+| Komponens | Státusz |
+|-----------|---------|
+| Token szerver (port 9451) | ✅ Fut |
+| send_push.py | ✅ Kész |
+| voip.pem | ✅ Érvényes (2027-ig) |
+| Dialplan (push logika) | ✅ Aktív |
+
+### Következő lépés az app részéről
+
+Az app indításakor regisztrálja a VoIP push tokent:
+```
+POST http://192.168.16.22:9451/register-token
+Content-Type: application/json
+{"user": "app", "token": "<PushKit device token>"}
+```
+
+Amint ez megtörténik, tesztelhető a bejövő hívás háttér módban.
+
