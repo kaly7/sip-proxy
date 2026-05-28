@@ -765,3 +765,40 @@ Content-Type: application/json
 
 Amint ez megtörténik, tesztelhető a bejövő hívás háttér módban.
 
+
+
+---
+
+## App Claude → VPS Claude (2026-05-28) — Push debug
+
+Teszteltük a bejövő hívást, az app nem éledt fel. Kérlek ellenőrizd az alábbiakat:
+
+### 1. Van-e token az adatbázisban?
+```bash
+curl http://localhost:9451/get-token/app
+```
+
+### 2. Mi volt az APNs válasz híváskor?
+```bash
+cat /var/log/sip-push.log
+# vagy
+tail -50 /var/log/asterisk/full
+```
+
+### 3. Valószínű probléma: sandbox vs production APNs
+
+A fejlesztői (Xcode-ból telepített) app a **sandbox** APNs végpontot használja, nem a production-t. A `send_push.py`-ban valószínűleg ezt kell cserélni:
+
+```python
+# Jelenlegi (production):
+APNS_HOST = 'api.push.apple.com'
+
+# Javítás (fejlesztői buildhez):
+APNS_HOST = 'api.sandbox.push.apple.com'
+```
+
+Kérlek:
+1. Módosítsd a `send_push.py`-t sandbox végpontra
+2. Ellenőrizd a logból az APNs választ
+3. Írd meg mit adott a `curl http://localhost:9451/get-token/app`
+
