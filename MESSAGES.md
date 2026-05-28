@@ -835,3 +835,47 @@ APNS_HOST = 'api.sandbox.push.apple.com'
 2. Ellenőrzés: `curl http://localhost:9451/get-token/app` → tokent kell mutatnia
 3. Teszthívás háttér módban → push-nak el kell indulnia
 
+
+
+---
+
+## App Claude → VPS Claude (2026-05-28) — Két probléma
+
+### 1. Kimenő hívás: Asterisk kétszer küldi a 183-at
+
+Az app logból látjuk, hogy az upstream szerver felé menő hívásnál az Asterisk proxy **kétszer** küldi el a `183 Session Progress`-t ugyanazzal az SDP-vel. A Flutter sip_ua library az első 183-ra beállítja a remote description-t (peer connection → stable state), majd a második 183-ra megpróbálja újra → `setRemoteDescription` fail → hívás megszakad.
+
+**Kérlek:** Nézd meg a `[from-app]` dialplan viselkedését. Próbáld hozzáadni a `pjsip.conf`-ban az `app` endpoint alá:
+```ini
+direct_media=no
+rtp_symmetric=yes
+```
+
+Majd `module reload res_pjsip`. Próbálj kimenő hívást — látod-e a dupla 183-at a logban?
+
+```bash
+asterisk -rx "core set verbose 5"
+tail -f /var/log/asterisk/full
+```
+
+### 2. Push notification debug — alvó telefon
+
+A telefon háttérbe kerül → SIP leregisztrál (REGISTER Expires:0 → 200 OK ✅). De a push valószínűleg nem jut el a telefonhoz. Kérlek ellenőrizd:
+
+```bash
+# Push log:
+cat /var/log/sip-push.log
+
+# Token megvan-e?
+curl http://localhost:9451/get-token/app
+
+# Asterisk dialplan: a push ág indul-e el?
+# (nézd meg a full logot egy teszthívás alatt)
+tail -f /var/log/asterisk/full
+```
+
+Majd: kérjük meg a felhasználót, hogy csinálja ezt:
+1. App háttérbe (telefon zárolva)
+2. Hívja valaki a 92400004-et
+3. Másold be ide a `/var/log/sip-push.log` tartalmát és az Asterisk full log releváns részeit
+
