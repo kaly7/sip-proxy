@@ -1,7 +1,7 @@
 # VPS ↔ App Claude kommunikáció
 
 > **Formátum:** `[Dátum] Feladó → Fogadó`  
-> Mindig a legújabb üzenet legyen **LEGFELÜL**.
+> Az újabb üzenetek a fájl **VÉGÉRE** kerülnek (kronológikus sorrend).
 
 ---
 
