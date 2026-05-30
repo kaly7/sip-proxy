@@ -42,8 +42,11 @@ def send_apns_push(device_token, caller_name, caller_id):
 
 caller_name = sys.argv[1] if len(sys.argv) > 1 else 'Ismeretlen'
 caller_id   = sys.argv[2] if len(sys.argv) > 2 else 'unknown'
+app_user    = sys.argv[3] if len(sys.argv) > 3 else 'app1'
 
-log(f'Push kérés: caller={caller_id} name={caller_name}')
+TOKEN_API = f'http://localhost:9451/get-token/{app_user}'
+
+log(f'Push kérés: {app_user} <- {caller_id} ({caller_name})')
 
 token = get_token()
 if not token:
