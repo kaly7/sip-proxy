@@ -5,7 +5,7 @@ from datetime import datetime
 VOIP_PEM   = '/etc/asterisk/keys/voip.pem'
 BUNDLE_ID  = 'com.kaly.sipApp'
 TOKEN_API  = 'http://localhost:9451/get-token/app'
-APNS_HOST  = 'api.sandbox.push.apple.com'
+APNS_HOST  = 'api.push.apple.com'
 LOG_FILE   = '/var/log/sip-push-apns.log'
 
 def log(msg):
