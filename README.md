@@ -31,7 +31,7 @@ Asterisk 20.19.0  (Debian 12, 192.168.16.22)
 | Szerver | `ws://192.168.16.22:8088/ws` |
 | Domain | `192.168.16.22` |
 | Felhasználónév | `app1` |
-| Jelszó | `app1234` |
+| Jelszó | `******34` |
 
 ## SIP szám
 
@@ -39,7 +39,7 @@ Asterisk 20.19.0  (Debian 12, 192.168.16.22)
 |---|---|
 | Szám | `92400004` |
 | Upstream | `193.131.100.41:5060` |
-| SIP jelszó | `Oob8aiRaht1e` |
+| SIP jelszó | `**********te` |
 
 ## Fájlok
 
