@@ -1,0 +1,99 @@
+# ============================================================
+# Szerver: 194.152.151.76 (rv42-kaly)
+# Tűzfal: firewalld → nftables backend
+# Dátum: 2026-06-11
+#
+# A firewalld a szabályokat automatikusan fordítja le nftables
+# formátumra. A tényleges szűrés a Linux kernel nftables
+# alrendszerében történik.
+#
+# Teljes ruleset: sudo nft list ruleset
+# Firewalld konfig: sudo firewall-cmd --list-all
+# ============================================================
+
+# ============================================================
+# NYITOTT PORTOK (mindenki számára elérhető)
+# ============================================================
+
+# --- Rendszer ---
+tcp 22        SSH – távoli elérés
+tcp 9090      Cockpit – webes szerver adminisztráció
+
+# --- FTP (vsftpd) ---
+tcp 21        FTP parancscsatorna
+tcp 40000-50000  FTP passzív mód adatcsatornák
+
+# --- BabL42 chat/videóhívás rendszer ---
+tcp 9453      BabL42 HTTP API
+tcp 9454      BabL42 WebSocket (ws://)
+tcp 9456      BabL42 HTTPS + WSS (wss://) – SSL terminálás
+
+# --- TURN szerver (coturn) – BabL42 WebRTC relay ---
+tcp 3478      TURN (TCP)
+udp 3478      TURN (UDP)
+tcp 5349      TURN TLS (TCP)
+udp 5349      TURN TLS (UDP)
+udp 49152-65535  TURN relay portok (WebRTC médiafolyamok)
+
+# --- SIP / Asterisk ---
+tcp 8088      Asterisk WebSocket – SIP app csatlakozás (WebRTC/SIP)
+              (Flutter app ezen regisztrálja a SIP végpontot)
+tcp 9452      SIP Admin panel (sipmgr)
+udp 10000-20000  RTP – SIP hívás hangadatfolyam
+
+# ============================================================
+# KORLÁTOZOTT PORTOK (IP whitelist)
+# ============================================================
+
+udp 5060      SIP trunk – CSAK 193.131.100.41 IP-ről fogad
+              (upstream VoIP provider)
+              Indok: az 5060/UDP-t folyamatosan scannelnek SIP
+              botok – brute force, toll fraud kísérletekkel.
+              Az app NEM ezen a porton csatlakozik (8088/tcp-n),
+              csak a provider–szerver trunk forgalom megy itt.
+
+# ============================================================
+# ZÁRVA (nem elérhető kívülről)
+# ============================================================
+
+tcp 9451      Token API (Python Flask) – csak localhost
+              Az Asterisk lokálisan hívja a push tokenek
+              lekérdezéséhez. Külső elérés nem szükséges.
+
+tcp 80        Apache default – letiltva
+tcp 443       Korábban SSH is hallgatott itt, eltávolítva
+
+# ============================================================
+# ALAPÉRTELMEZETT VISELKEDÉS
+# ============================================================
+#
+# - Minden egyéb bejövő forgalom: REJECT (admin-prohibited)
+# - Established/related kapcsolatok: automatikusan ACCEPT
+# - Loopback (lo): ACCEPT
+# - Invalid állapotú csomagok: DROP
+# - ICMP / ICMPv6: ACCEPT (ping működik)
+# - IPv6 neighbor discovery: ACCEPT
+
+# ============================================================
+# A TÉNYLEGES NFTABLES SZABÁLYOK (filter_IN_public_allow lánc)
+# ============================================================
+#
+# Ez az a lánc, ahol a konkrét port-engedélyek vannak:
+#
+#   tcp dport 22 accept
+#   tcp dport 9090 accept
+#   tcp dport 21 ct helper set "helper-ftp-tcp"
+#   tcp dport 21 accept
+#   tcp dport 9453 accept
+#   tcp dport 9454 accept
+#   tcp dport 9456 accept
+#   tcp dport 40000-50000 accept
+#   tcp dport 3478 accept
+#   udp dport 3478 accept
+#   tcp dport 5349 accept
+#   udp dport 5349 accept
+#   udp dport 49152-65535 accept
+#   tcp dport 8088 accept
+#   tcp dport 9452 accept
+#   udp dport 10000-20000 accept
+#   ip saddr 193.131.100.41 udp dport 5060 accept   ← SIP whitelist
