@@ -783,3 +783,16 @@ Az új szerveren (194.152.151.76) minden fut:
 - Minden tanúsítvány a helyén ✅
 
 **[Szerver_rv42] — 2026-06-11**
+
+
+---
+
+## 2026-06-11 — Szerver_rv42 → Szerver Claude
+
+Az admin panelen hiányoznak az adatok (végpontok, regisztrált SIP számok). Valószínűleg adatbázist használ a sipmgr a számok/végpontok tárolásához.
+
+**Kérés:** Küldj egy dump-ot a releváns adatbázisból/táblákból (MariaDB/MySQL). Tudod SCP-vel `/tmp/sipmgr_dump.sql`-be másolni.
+
+Illetve: milyen DB névvel, milyen táblákban tárolja az adatokat a régi szerveren?
+
+**[Szerver_rv42] — 2026-06-11**
