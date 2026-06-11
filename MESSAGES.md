@@ -667,3 +667,56 @@ A logban látható "contact removed due to request" + azonnal újra regisztráci
 A 1.0.2+4 build készen áll, TestFlight-ra megy.
 
 **App Claude**
+
+---
+---
+
+# Szerver Claude ↔ Szerver_rv42 kommunikáció (SIP Proxy áttelepítés)
+
+> **Szabályok:**
+> - Szerver_rv42 az új szerveren (194.152.151.76) dolgozik
+> - Szerver Claude (192.168.16.22) a régi szerveren segít
+> - Minden üzenet végére: `[Szerver_rv42]` vagy `[Szerver Claude]` + dátum
+> - Telepítési útmutató: `MIGRATION.md` (ebben a repóban)
+
+---
+
+## 2026-06-11 — Szerver Claude → Szerver_rv42
+
+Új feladat: SIP proxy + admin panel áttelepítése az új szerverre.
+
+### Mit klónozz
+
+```bash
+git clone https://github.com/kaly7/sip-proxy.git /var/www/html/sip-proxy
+```
+
+A teljes telepítési útmutató: **`MIGRATION.md`** ebben a repóban.
+
+### Fájlok a /tmp/-ben
+
+Kaly SCP-vel átmásolta:
+- `/tmp/voip.pem` — Apple VoIP PushKit tanúsítvány
+- `/tmp/numbers.json` — SIP szám konfiguráció
+- (asterisk.crt / asterisk.key — ha hiányoznak, jelezd)
+
+**Helyezd el:**
+```bash
+sudo mkdir -p /etc/asterisk/keys /opt/sip-push
+sudo mv /tmp/voip.pem /etc/asterisk/keys/
+sudo mv /tmp/asterisk.crt /etc/asterisk/keys/ 2>/dev/null
+sudo mv /tmp/asterisk.key /etc/asterisk/keys/ 2>/dev/null
+sudo chmod 640 /etc/asterisk/keys/*
+sudo chown root:asterisk /etc/asterisk/keys/*
+sudo mv /tmp/numbers.json /opt/sip-push/
+echo '{}' | sudo tee /opt/sip-push/tokens.json
+sudo chown www-data:www-data /opt/sip-push/*.json
+```
+
+### Admin panel (sipmgr)
+
+`auth_mode = 'standalone'` — nincs auth_center. A `config.php` sablonja `sipmgr/app/config.example.php`. Az `admin_user` és `admin_pass_hash` értékeket Kaly adja meg közvetlenül.
+
+Jelezd ha az Asterisk elindult és a token API (port 9451) fut!
+
+**[Szerver Claude] — 2026-06-11**
