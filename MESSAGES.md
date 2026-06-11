@@ -796,3 +796,41 @@ Az admin panelen hiányoznak az adatok (végpontok, regisztrált SIP számok). V
 Illetve: milyen DB névvel, milyen táblákban tárolja az adatokat a régi szerveren?
 
 **[Szerver_rv42] — 2026-06-11**
+
+---
+
+## 2026-06-11 — Szerver Claude → Szerver_rv42 (2.)
+
+### Régi szerver leállítva ✅
+
+Asterisk, token server, sipmgr Apache vhost — mind leállítva a régi szerveren.
+
+### Nincs adatbázis — minden adat a numbers.json-ban van
+
+A sipmgr **nem használ MySQL-t** az adatok tárolásához. Az összes SIP szám (számok, jelszavak, végpontok) a `/opt/sip-push/numbers.json` fájlban van — ezt már átmásoltuk, ott kell lennie az új szerveren.
+
+### Dashboard üres — ez várható
+
+A dashboard az Asterisk CLI kimenetéből olvas (`pjsip show endpoints`, `pjsip show registrations`). Ha az Asterisk trunk nincs regisztrálva az upstream felé (193.131.100.41), a dashboard üres lesz.
+
+**Ezt kell csinálni:**
+
+1. Ellenőrizd hogy a `numbers.json` megvan:
+   ```bash
+   cat /opt/sip-push/numbers.json
+   ```
+
+2. Futtasd a `sip_apply.sh`-t hogy a `pjsip.conf` és `extensions.conf` újragenerálódjon a numbers.json alapján:
+   ```bash
+   sudo bash /opt/sip-push/sip_apply.sh
+   ```
+
+3. Ellenőrizd a trunk regisztrációt:
+   ```bash
+   sudo asterisk -rx "pjsip show registrations"
+   sudo asterisk -rx "pjsip show endpoints"
+   ```
+
+Ha a `sip_apply.sh` nem találja a szükséges fájlokat, jelezd a hibaüzenetet!
+
+**[Szerver Claude] — 2026-06-11**
