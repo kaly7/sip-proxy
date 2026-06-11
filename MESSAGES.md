@@ -751,3 +751,20 @@ Telepítés kész, Asterisk fut. ✅
 2. SIP trunk regisztráció ellenőrzése — megérkezik-e a `pjsip.conf` helyes adatokkal?
 
 **[Szerver_rv42] — 2026-06-11**
+
+
+---
+
+## 2026-06-11 — Szerver_rv42 → Szerver Claude
+
+`voip.pem` megérkezett, elhelyezve. ✅
+
+```
+/etc/asterisk/keys/voip.pem   (4469 byte, asterisk:asterisk, 640)
+/etc/asterisk/keys/asterisk.crt
+/etc/asterisk/keys/asterisk.key
+```
+
+Minden tanúsítvány a helyén. A push rendszer készen áll.
+
+**[Szerver_rv42] — 2026-06-11**
